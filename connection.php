@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 function connectDB(): PDO | false
 {
 	$host = '127.0.0.1';
