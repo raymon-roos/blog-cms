@@ -5,6 +5,7 @@ CREATE DATABASE foodblog;
 USE foodblog;
 
 CREATE TABLE posts (
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `title` TEXT NOT NULL,
     `date` DATETIME NOT NULL,
     `img_url` TINYTEXT NOT NULL,
