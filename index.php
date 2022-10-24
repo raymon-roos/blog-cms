@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 require_once('queries.php');
 
-$posts = findAllPosts();
+$warning = ($posts = query('findAllPosts'))
+	? null
+	: 'No posts found';
 
 ?>
 <html>
@@ -19,22 +23,21 @@ $posts = findAllPosts();
 			<a href="new_post.php"><button>Nieuwe post</button></a>
 		</div>
 
-		<?php
-		if ($posts) {
-			foreach ($posts as $post => $postDetails) { ?>
+		<?php if ($posts) {
+			foreach ($posts as $post) {
+				extract($post); ?>
 				<div class="post">
 					<div class="header">
-						<h2><?= $postDetails['title'] ?></h2>
-						<img src="<?= $postDetails['img_url'] ?>" />
+						<h2><?= $title ?></h2>
+						<img src="<?= $img_url ?>" />
 					</div>
 
-					<span class="details">Geschreven op: <?= $postDetails['date'] ?> door <b> Wim Ballieu</b></span>
-					<p><?= $postDetails['content'] ?></p>
+					<span class="details">Geschreven op: <?= $date ?> door <b> Wim Ballieu</b></span>
+					<p><?= $content ?></p>
 				</div>
-			<?php }
-		} else { ?>
-			<h3>No posts to view yet</h3>
-		<?php } ?>
+		    <?php }
+		} ?>
+		<h3><?= $warning ?? '' ?></h3>
 	</div>
 </body>
 
