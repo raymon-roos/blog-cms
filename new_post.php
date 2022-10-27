@@ -2,17 +2,27 @@
 
 declare(strict_types=1);
 
-if (!empty($_POST)) {
-	$post = array_filter(array_map('htmlspecialchars', $_POST));
-	if ($post && count($post) === 3) {
-		require_once('queries.php');
-		if (query('submitPost', $post)) {
-			header('location: ./index.php');
-			exit();
-		}
+require_once('queries.php');
+
+function validateInput(array $post): string | bool
+{
+	$post = array_map('htmlspecialchars', array_filter($post));
+	$post['author'] = intval($post['author']);
+
+	if (!$post || count($post) !== 4) {
+		return 'Please fill in all the fields';
 	}
 
-	$warning = 'Please fill in all the fields';
+	return query('submitPost', $post) ?: 'Something went wrong, please try again later';
+}
+
+if (!empty($_POST)) {
+	if (validateInput($_POST) === true) {
+		header('location: ./index.php');
+		exit();
+	}
+
+	$warning = validateInput($_POST);
 }
 
 ?>
@@ -40,6 +50,13 @@ if (!empty($_POST)) {
 			<input type="text" name="img_url">
 			<label for="img_url">Inhoud:</label>
 			<textarea name="content" rows="10" cols="100"></textarea>
+			<label for="author">author:</label>
+			<select type="drop" name="author">
+				<?php foreach (query('findAllAuthors') as $author) {
+					extract($author) ?>
+					<option value="<?= $id ?>"><?= $name ?></option>
+				<?php } ?>
+			</select>
 			<input type="submit" value="Publiceer">
 		</form>
 
