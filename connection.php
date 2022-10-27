@@ -2,20 +2,29 @@
 
 declare(strict_types=1);
 
-function connectDB(): PDO | false
+class DBService
 {
-	$host = '127.0.0.1';
-	$db = 'foodblog';
-	$user = 'bit_academy';
-	$pass = 'bit_academy';
-	$dsn = "mysql:host=$host;dbname=$db";
+	private static PDO $pdo;
 
-	try {
-		$pdo = new PDO($dsn, $user, $pass);
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-		return $pdo;
-	} catch (Throwable) {
-		return false;
+	public static function connectDB()
+	{
+		if (isset(self::$pdo)) {
+			return self::$pdo;
+		}
+
+		$newPDO = new PDO(
+			'mysql:host=127.0.0.1;dbname=foodblog',
+			'bit_academy',
+			'bit_academy',
+		);
+		$newPDO->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+		self::$pdo = $newPDO;
+
+		return self::$pdo;
+	}
+
+	private function __construct()
+	{
 	}
 }
