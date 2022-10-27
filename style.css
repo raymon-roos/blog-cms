@@ -89,18 +89,21 @@ form {
 	height: max-content;
 }
 
-input[type=text], textarea {
+input[type=text],
+textarea {
 	width: 70%;
 	border: none;
 	border-radius: 0.5em;
 	box-shadow: 0em 0em 0.2em;
-	margin: 2em 8em;
+	margin: 1em 8em;
 }
 
-input[type=submit] {
-	width: 10%;
+input[type=submit],
+select {
+	width: 20%;
 	border: none;
 	border-radius: 1em;
+	margin: 1em 8em;
 	box-shadow: 0em 0em 0.4em;
 	padding: 0.2em 0.2em;
 
