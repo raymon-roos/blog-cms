@@ -8,10 +8,12 @@ class DBService
 
 	public static function connectDB()
 	{
-		if (isset(self::$pdo)) {
-			return self::$pdo;
-		}
+		return self::$pdo
+			?? (new self())::$pdo;
+	}
 
+	private function __construct()
+	{
 		$newPDO = new PDO(
 			'mysql:host=127.0.0.1;dbname=foodblog',
 			'bit_academy',
@@ -19,12 +21,6 @@ class DBService
 		);
 		$newPDO->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-		self::$pdo = $newPDO;
-
-		return self::$pdo;
-	}
-
-	private function __construct()
-	{
+		return self::$pdo = $newPDO;
 	}
 }
