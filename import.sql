@@ -4,21 +4,33 @@ CREATE DATABASE foodblog;
 
 USE foodblog;
 
-CREATE TABLE posts (
+CREATE TABLE authors (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `title` TEXT(1000) NOT NULL,
-    `date` DATETIME NOT NULL DEFAULT NOW(),
-    `img_url` TINYTEXT NOT NULL,
-    `author` TINYTEXT NOT NULL,
-    `content` TEXT NOT NULL
+	`name` ENUM('Miljuschka', 'Mounir Toub', 'Wim Ballieu')
 );
 
-INSERT INTO posts (`title`, `date`, `img_url`, `author`, `content`)
+INSERT INTO authors (`name`)
+VALUES
+	('Miljuschka'),
+	('Mounir Toub'),
+	('Wim Ballieu');
+
+CREATE TABLE posts (
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`title` TEXT(1000) NOT NULL,
+	`date` DATETIME NOT NULL DEFAULT NOW(),
+	`img_url` TINYTEXT NOT NULL,
+	`author_id` INT NOT NULL,
+	FOREIGN KEY(`author_id`) REFERENCES `authors`(`id`),
+	`content` TEXT NOT NULL
+);
+
+INSERT INTO posts (`title`, `date`, `img_url`, `author_id`, `content`)
 VALUES (
 	'Pindakaas',
 	'2020:06:18 13:25:00',
 	'https://i.ibb.co/C0Lb7R1/pindakaas.jpg',
-	'Wim Ballieu',
+	3,
 	'Verwarm de oven voor op 180 °C. Verdeel de pinda’s over een met bakpapier beklede bakplaat en rooster in ca. 8 min. lichtbruin. Schep regelmatig om. Maal de warme pinda’s in de keukenmachine in 4 min. tot een grove, dikke pindakaas. Schep de rand van de kom regelmatig schoon met een spatel. Voeg het zout, de olie en honing toe en maal nog 1 min. tot een gladde pindakaas. Schep in een pot en sluit af.
 	variatietip: Houd je van pindakaas met een smaakje? Voeg dan na de honing 1 el sambal badjak, 1 tl gemalen kaneel of 1 el fijngehakte pure chocolade toe. bewaartip: Je kunt de pindakaas 3 weken in de koelkast bewaren.'
 ),
@@ -26,7 +38,7 @@ VALUES (
 	'Baklava',
 	'2020:03:11 10:28:00',
 	'https://i.ibb.co/ZWVRdPT/baklava.jpg',
-	'Wim Ballieu',
+	2,
 	'Voorbereiding
 
 	Verwarm de oven voor op 190 °C. Vet de bakvorm in met roomboter.
