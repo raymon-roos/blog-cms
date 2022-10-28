@@ -1,110 +1,123 @@
-body {
-	width: 100vw;
-	height: 100vh;
+html {
+  width: 100vw;
+  height: 100vh;
 }
 
 .container {
-	width: calc(500px + 40%);
-	height: inherit; 
-	margin-left: auto;
-	margin-right: auto;
+  width: 75%;
+  max-width: 900px;
+  height: inherit; 
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #header {
-	margin-top: 30px;
-	margin-bottom: 50px;
-	border-bottom: 4px #000 solid;
+  margin-top: 30px;
+  margin-bottom: 50px;
+  border-bottom: 4px #000 solid;
 }
 
-
 #header button {
-	float: right;
-	margin-top: 40px;
+  float: right;
+  margin-top: 40px;
 }
 
 .post {
-	margin: 70px 70px;
-	border-bottom: 3px solid black;
+  margin: 60px;
+  border-bottom: 3px solid black;
+}
+
+.post  p {
+  margin: 10px 0px;
+}
+
+.rate {
+  display: inline;
+  border: none;
+  background: none;
 }
 
 .header {
-	margin-bottom: 10px;
-	position: relative;
-	background-color: #eeedec;
-	width: 800px;
-	height: 250px;
+  margin-bottom: 5px;
+  position: relative;
+  background-color: #eeedec;
+  height: 250px;
 }
 
 .warning  {
-	background-color: red;
-	border-radius: 1em;
-	width: fit-content;
-	margin: auto;
-	color: orange;
+  background-color: red;
+  border-radius: 1em;
+  width: fit-content;
+  margin: auto;
+  color: orange;
 }
 
 img {
-	opacity: 0.4;
-	width: 800px;
-	height: 250px;
-	object-fit: cover;
+  opacity: 0.4;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
 }
 
 h1 {
-	float: center;
-	font-size: 60px;
-	display: inline;
+  float: center;
+  font-size: 60px;
+  display: inline;
 }
 
 h2 {
-	text-decoration: underline overline;
-	text-transform: uppercase;
-	position: absolute;
-	top: 30%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	font-size: 50px;
+  text-decoration: underline overline;
+  text-transform: uppercase;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
 }
-
-span.right {
-	float: right;
-	color: #B0B0B0;
-	margin-bottom: 0px;
-}
-
 
 span.details {
-	margin: 2px;
-	color: #787878;
-	font-size: 15px;
-	font-style: italic;
-	display: block;
+  margin-left: 4px;
+  color: #787878;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.likescontainer {
+  display: inline;
+  width: fit-content;
+  float: right;
+  margin: 0px 4px;
+}
+
+.likescontainer button {
+  width: min-content;
+  padding: 0px;
 }
 
 form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-	height: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: max-content;
 }
 
 input[type=text],
 textarea {
-	width: 70%;
-	border: none;
-	border-radius: 0.5em;
-	box-shadow: 0em 0em 0.2em;
-	margin: 1em 8em;
+  width: 70%;
+  border: none;
+  border-radius: 0.5em;
+  box-shadow: 0em 0em 0.2em;
+  margin: 1em 8em;
 }
 
 input[type=submit],
 select {
-	width: 20%;
-	border: none;
-	border-radius: 1em;
-	margin: 1em 8em;
-	box-shadow: 0em 0em 0.4em;
-	padding: 0.2em 0.2em;
+  width: 20%;
+  border: none;
+  border-radius: 1em;
+  margin: 1em 8em;
+  box-shadow: 0em 0em 0.4em;
+  padding: 0.2em 0.2em;
 
 }

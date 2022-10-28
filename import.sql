@@ -22,15 +22,17 @@ CREATE TABLE posts (
 	`img_url` TINYTEXT NOT NULL,
 	`author_id` INT NOT NULL,
 	FOREIGN KEY(`author_id`) REFERENCES `authors`(`id`),
+	`likes` INT NOT NULL DEFAULT 0,
 	`content` TEXT NOT NULL
 );
 
-INSERT INTO posts (`title`, `date`, `img_url`, `author_id`, `content`)
+INSERT INTO posts (`title`, `date`, `img_url`, `author_id`, `likes`, `content`)
 VALUES (
 	'Pindakaas',
 	'2020:06:18 13:25:00',
 	'https://i.ibb.co/C0Lb7R1/pindakaas.jpg',
 	3,
+	1,
 	'Verwarm de oven voor op 180 °C. Verdeel de pinda’s over een met bakpapier beklede bakplaat en rooster in ca. 8 min. lichtbruin. Schep regelmatig om. Maal de warme pinda’s in de keukenmachine in 4 min. tot een grove, dikke pindakaas. Schep de rand van de kom regelmatig schoon met een spatel. Voeg het zout, de olie en honing toe en maal nog 1 min. tot een gladde pindakaas. Schep in een pot en sluit af.
 	variatietip: Houd je van pindakaas met een smaakje? Voeg dan na de honing 1 el sambal badjak, 1 tl gemalen kaneel of 1 el fijngehakte pure chocolade toe. bewaartip: Je kunt de pindakaas 3 weken in de koelkast bewaren.'
 ),
@@ -39,6 +41,7 @@ VALUES (
 	'2020:03:11 10:28:00',
 	'https://i.ibb.co/ZWVRdPT/baklava.jpg',
 	2,
+	1,
 	'Voorbereiding
 
 	Verwarm de oven voor op 190 °C. Vet de bakvorm in met roomboter.

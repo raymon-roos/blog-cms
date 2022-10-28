@@ -7,15 +7,11 @@ require_once('connection.php');
 function findAllPosts(PDO $pdo): array | false
 {
 	return $pdo->query(
-		'SELECT
-			`posts`.`title`, 
-			`posts`.`date`, 
-			`posts`.`img_url`, 
-			`authors`.`name` as `author`, 
-			`posts`.`content`
-	    FROM `posts`
+		'SELECT `posts`.`id`, `title`, `date`, `img_url`, `likes`, `content`,
+			`authors`.`name` as `author`
+		FROM `posts`
 		LEFT JOIN `authors` ON `authors`.`id` = `posts`.`author_id`
-		ORDER BY `date` DESC;'
+		ORDER BY `likes` DESC;'
 	)->fetchAll();
 }
 
@@ -34,12 +30,25 @@ function submitPost(PDO $pdo, array $data): bool
 	)->execute($data);
 }
 
+function submitRating(PDO $pdo, array $rating): bool
+{
+	[$up_down, $id] = $rating;
+	$stmt = $pdo->prepare(
+		"UPDATE `posts` SET `likes` = `likes` + :rating
+		WHERE id = :id"
+	);
+	$stmt->bindValue(':rating', ($up_down) ? 1 : -1, PDO::PARAM_INT);
+	$stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+	return $stmt->execute();
+}
+
 function query(callable $queryfunc, array $data = []): mixed
 {
 	try {
-		return $queryfunc(DBService::connectDB(), $data);
-	} catch (\Throwable $th) {
-		return  $th->getMessage();
-		/* return  "*Ominous silence* Something is off..."; */
+		return $queryfunc(DBService::connectDB(), $data)
+			?: throw new Exception();
+	} catch (\Throwable) {
+		return  "*Ominous silence* Something is off...";
 	}
 }
