@@ -22,7 +22,8 @@ if (!empty($_POST['downvote'])) {
 }
 
 $posts = query('findAllPosts');
-$warning = is_string($posts) ? $posts : '';
+$topAuthors = query('findTopAuthors');
+$warning = is_string($posts) ? $posts : (is_string($topAuthors) ? $topAuthors : '');
 
 ?>
 <!DOCTYPE html>
@@ -41,6 +42,14 @@ $warning = is_string($posts) ? $posts : '';
 			<h1>Foodblog</h1>
 			<a href="new_post.php"><button>Nieuwe post</button></a>
 		</article>
+
+		<?php if (is_array($topAuthors)) { ?>
+			<ul>
+				<?php foreach ($topAuthors as $author) { ?>
+					<li><?= $author['name'] ?></li>
+				<?php } ?>
+			</ul>
+		<?php } ?>
 
 		<?php if (is_array($posts)) {
 			foreach ($posts as $post) {
@@ -78,7 +87,7 @@ $warning = is_string($posts) ? $posts : '';
 					</span>
 					<p><?= $content ?></p>
 				</article>
-			<?php }
+		    <?php }
 		} ?>
 
 		<article class="warning">

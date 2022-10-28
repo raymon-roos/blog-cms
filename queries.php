@@ -15,6 +15,17 @@ function findAllPosts(PDO $pdo): array | false
 	)->fetchAll();
 }
 
+function findTopAuthors(PDO $pdo): array | false
+{
+	return $pdo->query(
+		'SELECT SUM(`posts`.`likes`) as `total_likes`, `authors`.`name`
+		FROM `authors`
+		LEFT JOIN `posts` ON `posts`.`author_id` = `authors`.`id`
+		GROUP BY `name`
+		HAVING `total_likes` > 10;'
+	)->fetchAll();
+}
+
 function findAllAuthors(PDO $pdo): array | false
 {
 	return $pdo->query(
