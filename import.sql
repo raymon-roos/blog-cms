@@ -6,19 +6,16 @@ USE foodblog;
 
 CREATE TABLE authors (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`name` ENUM('Miljuschka', 'Mounir Toub', 'Wim Ballieu')
+	`name` ENUM('Miljuschka', 'Mounir Toub', 'Wim Ballieu') NOT NULL
 );
 INSERT INTO authors (`name`)
-VALUES
-	('Miljuschka'),
-	('Mounir Toub'),
-	('Wim Ballieu');
+VALUES ('Miljuschka'), ('Mounir Toub'), ('Wim Ballieu');
 
 CREATE TABLE tags (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`tag` TINYTEXT NOT NULL UNIQUE
 );
-
+INSERT INTO tags (`tag`) VALUES ('breakfast'), ('lunch'), ('diner'); 
 
 CREATE TABLE posts (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

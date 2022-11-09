@@ -3,26 +3,16 @@
 declare(strict_types=1);
 
 require_once('queries.php');
-
-function validateInput(array $post): string | bool
-{
-	$post = array_map('htmlspecialchars', array_filter($post));
-	$post['author'] = intval($post['author']);
-
-	if (!$post || count($post) !== 4) {
-		return 'Please fill in all the fields';
-	}
-
-	return query('submitPost', $post) ?: 'Something went wrong, please try again later';
-}
+require_once('helpers.php');
 
 if (!empty($_POST)) {
-	if (validateInput($_POST) === true) {
+	$result = processSubmit($_POST);
+
+	if ($result) {
 		header('location: ./index.php');
 		exit();
 	}
-
-	$warning = validateInput($_POST);
+	$result = 'something went wrong';
 }
 
 ?>
@@ -37,34 +27,35 @@ if (!empty($_POST)) {
 </head>
 
 <body>
-	<section class="container">
+	<main class="container">
 		<article id="header">
-			<h1>Nieuwe post</h1>
-			<a href="index.php"><button>Alle posts</button></a>
+			<h1>New post</h1>
+			<a href="index.php"><button>All posts</button></a>
 		</article>
 
 		<form action="new_post.php" method="post">
-			<label for="title">Titel:</label>
+			<label for="title">Title:</label>
 			<input type="text" name="title">
-			<label for="img_url">URL afbeelding:</label>
-			<input type="text" name="img_url">
-			<label for="img_url">Inhoud:</label>
-			<textarea name="content" rows="10" cols="100"></textarea>
 			<label for="author">author:</label>
 			<select type="drop" name="author">
-				<?php foreach (query('findAllAuthors') as $author) {
-					extract($author) ?>
-					<option value="<?= $id ?>"><?= $name ?></option>
+				<?php foreach (query('findAllAuthors') as $author) { ?>
+					<option value="<?= $author['id'] ?>"><?= $author['name'] ?></option>
 				<?php } ?>
 			</select>
+			<label for="img_url">IMG Url:</label>
+			<input type="text" name="img_url">
+			<label for="content">Content:</label>
+			<textarea name="content" rows="10" cols="100"></textarea>
+			<label for="tags">Tags (comma separated):</label>
+			<input type="text" name="tags">
 			<input type="submit" value="Publiceer">
 		</form>
 
 		<article class="warning">
-			<h3><?= $warning ?? '' ?></h3>
+			<h3><?= $result ?? '' ?></h3>
 		</article>
-		<?php unset($warning); ?>
-	</section>
+		<?php unset($result); ?>
+	</main>
 </body>
 
 </html>
