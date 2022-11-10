@@ -53,7 +53,7 @@ VALUES (
 	Snijd elke staaf met een scherp mes meteen in zessen. Bak de baklava in circa 25 minuten goudbruin en krokant in de oven.
 	Neem de bakvorm uit de oven en verdeel de warme honing over de baklava. Garneer meteen met de rest van de fijngemalen walnoten. Laat de baklava minimaal 3 uur afkoelen voordat je ervan gaat genieten.'
 ), (
-	'test',
+	'testing tags',
 	'2022:10:28 17:23:00',
 	'test',
 	1,
@@ -67,3 +67,5 @@ CREATE TABLE posts_tags (
 	FOREIGN KEY(`post_id`) REFERENCES `posts`(`id`),
 	FOREIGN KEY(`tag_id`) REFERENCES `tags`(`id`)
 );
+INSERT INTO posts_tags (`post_id`, `tag_id`)
+VALUES (3, 1), (3, 2), (3, 3);
