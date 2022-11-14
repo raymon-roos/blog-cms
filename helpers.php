@@ -99,6 +99,7 @@ function renderWarningIfExists(?string &$warning): void
 
 function debug(mixed ...$vars): void
 {
+	echo count($vars);
 	require_once('templates/components/debug.php');
 	exit();
 }
