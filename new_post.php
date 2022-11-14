@@ -5,57 +5,19 @@ declare(strict_types=1);
 require_once('queries.php');
 require_once('helpers.php');
 
-if (!empty($_POST)) {
-	$result = processSubmit($_POST);
+try {
+	if (!empty($_POST)) {
+		$processSubmitIsSuccess = processSubmit($_POST);
+	}
 
-	if ($result) {
+	if ($processSubmitIsSuccess ?? false) {
 		header('location: ./index.php');
 		exit();
 	}
-	$result = 'something went wrong';
+
+	$authors = performQuery('findAllAuthors');
+	require_once('templates/new_post.php');
+} catch (\Throwable $th) {
+	$warning = $th->getMessage();
+	require_once('templates/error.php');
 }
-
-?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<title></title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="style.css" rel="stylesheet">
-</head>
-
-<body>
-	<main class="container">
-		<article id="header">
-			<h1>New post</h1>
-			<a href="index.php"><button>All posts</button></a>
-		</article>
-
-		<form action="new_post.php" method="post">
-			<label for="title">Title:</label>
-			<input type="text" name="title">
-			<label for="author">author:</label>
-			<select type="drop" name="author">
-				<?php foreach (query('findAllAuthors') as $author) { ?>
-					<option value="<?= $author['id'] ?>"><?= $author['name'] ?></option>
-				<?php } ?>
-			</select>
-			<label for="img_url">IMG Url:</label>
-			<input type="text" name="img_url">
-			<label for="content">Content:</label>
-			<textarea name="content" rows="10" cols="100"></textarea>
-			<label for="tags">Tags (comma separated):</label>
-			<input type="text" name="tags">
-			<input type="submit" value="Publiceer">
-		</form>
-
-		<article class="warning">
-			<h3><?= $result ?? '' ?></h3>
-		</article>
-		<?php unset($result); ?>
-	</main>
-</body>
-
-</html>

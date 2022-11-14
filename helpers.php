@@ -11,7 +11,9 @@ function processTags(string $tags): array | false
 		)
 	);
 
-	return !empty($tags) ? $tags : false;
+	return !empty($tags)
+		? $tags
+		: throw new Exception('Please fill in the fields properly');
 }
 
 function processPost(array $post): array | string
@@ -19,88 +21,84 @@ function processPost(array $post): array | string
 	$post = array_map('htmlspecialchars', array_filter($post));
 	$post['author'] = intval($post['author']);
 
-	return ($post && count($post) === 4) ? $post : false;
+	return (!empty($post) && count($post) === 4)
+		? $post
+		: throw new Exception('Please fill in the fields properly');
 }
 
 function processSubmit(array $input): bool
 {
 	$post = processPost(array_slice($input, 0, 4));
 
-	if (!is_array($post)) {
-		return false;
-	}
+	$postSubmitIsSucess = performQuery('insertPost', $post);
 
 	if (!empty($input['tags'])) {
 		$tags = processTags($input['tags']);
+		performQuery('insertTags', $tags);
+		performQuery('linkTagsToPost', performQuery('findTagIDsByName', $tags));
 	}
 
-	$postResult = query('submitPost', $post);
-
-	if (is_array($tags)) {
-		$tagsResult = query('insertTags', $tags);
-		$tagIDs = query('findTagIDsByName', $tags);
-		$tagsResult = (query('linkTagsToPost', $tagIDs));
-	}
-
-	return  !empty($postResult) && !empty($tagsResult);
+	return  $postSubmitIsSucess
+		?: throw new Exception('An error occured, please try again later');
 }
 
-
-/**
- * Outputs a list of given posts to the screen
- *
- * @param null|array $posts previously retrieved posts from the database
- * @param null|string $authorName optional name of author to print if it is not included in the posts' data
- */
-function renderPostsList(?array $posts, ?string $authorName = null): void
+function processUpOrDownVote(array $vote): void
 {
+	match (array_key_first($vote)) {
+		'upvote' => performQuery('submitRating', [1, (intval($_POST['upvote']))]),
+		'downvote' => performQuery('submitRating', [-1, intval($_POST['downvote'])]),
+	};
+}
+
+function renderPostsOverview(?array $posts): void
+{
+	if (empty($posts)) {
+		throw new Exception('Nothing here yet, come back later');
+	}
+
 	foreach ($posts as $post) {
-		extract($post); ?>
-		<article class="post">
-			<header class="header">
-				<h2><?= $title ?></h2>
-				<img src="<?= $img_url ?>" />
-			</header>
-			<span class="details">
-				Geschreven op: <?= $date ?> door <b><?= $authorName ?? $author ?></b>
-				<b><?php var_dump($tags) ?></b>
-				<form action="index.php" method="post" class="likescontainer">
-					<button type="submit" name="upvote" value="<?= $id ?>" class="rate">
-						<svg width="24px" height="24px" viewBox="0 0 24 24">
-							<path d="M4 14h4v7a1
-								1 0 0 0 1 1h6a1
-								1 0 0 0 1-1v-7h4a1.001
-								1.001 0 0
-								0 .781-1.625l-8-10c-.381-.475-1.181-.475-1.562
-								0l-8 10A1.001
-								1.001 0 0 0 4 14z">
-							</path>
-						</svg>
-					</button>
-					<span class="likes"><b><?= $likes ?></b></span>
-					<button type="submit" name="downvote" value="<?= $id ?>" class="rate">
-						<svg width="24px" height="24px" viewBox="0 0 24 24">
-							<path d="M20.901 10.566A1.001
-								1.001 0 0 0 20 10h-4V3a1
-								1 0 0 0-1-1H9a1
-								1 0 0 0-1 1v7H4a1.001
-								1.001 0 0 0-.781 1.625l8 10a1
-								1 0 0 0 1.562
-								0l8-10c.24-.301.286-.712.12-1.059z">
-							</path>
-						</svg>
-					</button>
-				</form>
-			</span>
-			<p><?= $content ?></p>
-		</article>
-	<?php }
+		$post['tags'] = performQuery('findTagsOnPost', [$post['id']]);
+		extract($post);
+		include('templates/components/post_listing.php');
+	}
 }
 
-function debug(mixed $var): void
+function renderOptionalComponent(string $component, ?array $setOfDataToRender = null): void
 {
-	echo '<pre><h2>';
-	var_dump($var);
-	echo '</h2></pre>';
+	if (!file_exists("templates/components/$component.php")) {
+		throw new Exception('component not found');
+	}
+
+	if (empty($setOfDataToRender)) {
+		return;
+	}
+
+	foreach ($setOfDataToRender as $dataSubset) {
+		extract($dataSubset);
+		include("templates/components/$component.php");
+	}
+}
+
+function gatherApropriatePostsBasedOnGETVar(array $get): array
+{
+	$posts = match (array_key_first($get)) {
+		'author' => performQuery('findPostsWithThisAuthor', [$get['author']]),
+		'tag' => performQuery('findPostsWithThisTag', [$get['tag']]),
+	};
+
+	return !empty($posts) ? $posts : throw new Exception('No posts found');
+}
+
+function renderWarningIfExists(?string &$warning): void
+{
+	if (!empty($warning)) {
+		require_once('templates/components/warning.php');
+		unset($warning);
+	}
+}
+
+function debug(mixed ...$vars): void
+{
+	require_once('templates/components/debug.php');
 	exit();
 }

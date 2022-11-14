@@ -7,35 +7,18 @@ require_once('helpers.php');
 
 function findAllPosts(PDO $pdo): array | false
 {
-	$postIDs = $pdo->query('SELECT `id` FROM `posts`;')->fetchAll();
-	$postsCollection = $pdo->query(
+	$posts = $pdo->query(
 		'SELECT `posts`.`id`, `title`, `date`, `img_url`, `likes`, `content`,
 			`authors`.`name` AS `author`
 		FROM `posts`
 		LEFT JOIN `authors` ON `authors`.`id` = `posts`.`author_id`
 		ORDER BY `likes` DESC;'
-	);
-
-	$tagsOnPost = implode(
-		', ',
-		array_map(
-			'$pdo->query(
-				"SELECT `tag` from `tags`
-				WHERE `tags`.`id` = `posts_tags`.`tag_id`
-				FROM `tags`
-				LEFT JOIN `tags` ON `tags`.`id` = `posts_tags`.`tag_id`;"
-			)->fetch',
-			$postIDs
-		)
-	);
-
-	debug($tagsOnPost);
-	exit();
+	)->fetchAll();
 
 	return !empty($posts) ? $posts : false;
 }
 
-function findTagsAttachedToPost(PDO $pdo, array $postID): array
+function findTagsOnPost(PDO $pdo, array $postID): array | false
 {
 	$stmt = $pdo->prepare(
 		'SELECT `tag`
@@ -45,13 +28,13 @@ function findTagsAttachedToPost(PDO $pdo, array $postID): array
 	);
 	$stmt->execute($postID);
 
-	return $stmt->fetchAll();
+	return array_column($stmt->fetchAll(), 'tag');
 }
 
 function findTopAuthors(PDO $pdo): array | false
 {
 	return $pdo->query(
-		'SELECT SUM(`posts`.`likes`) as `total_likes`, `authors`.`name`, `authors`.`id`
+		'SELECT SUM(`posts`.`likes`) AS `total_likes`, `authors`.`name`, `authors`.`id`
 		FROM `authors`
 		LEFT JOIN `posts` ON `posts`.`author_id` = `authors`.`id`
 		GROUP BY `name`
@@ -60,19 +43,38 @@ function findTopAuthors(PDO $pdo): array | false
 	)->fetchAll();
 }
 
-function findPostsByAuthor(PDO $pdo, array $id): array | false
+function findPostsWithThisAuthor(PDO $pdo, array $name): array | false
 {
 	$stmt = $pdo->prepare(
-		'SELECT `posts`.`id`, `title`, `date`, `img_url`, `likes`, `content`, `authors`.`id`
+		'SELECT `posts`.`id`, `title`, `date`, `img_url`, `likes`, `content`,
+			`authors`.`name` AS `author`
 		FROM `posts`
 		LEFT JOIN `authors` ON `authors`.`id` = `posts`.`author_id`
-		WHERE `posts`.`author_id` = :id
+		WHERE `authors`.`name` = ?
 		ORDER BY `likes` DESC;'
 	);
-	$stmt->execute($id);
+	$stmt->execute($name);
 
 	return $stmt->fetchAll();
 }
+
+function findPostsWithThisTag(PDO $pdo, array $tags): array | false
+{
+	$stmt = $pdo->prepare(
+		'SELECT `posts`.`id`, `title`, `date`, `img_url`, `likes`, `content`,
+			`authors`.`name` AS `author`
+		FROM `posts`
+		INNER JOIN `authors` on `authors`.`id` = `posts`.`author_id`
+		WHERE `posts`.`id` IN
+			(SELECT `post_id` FROM `posts_tags`
+			INNER JOIN `tags` on `tags`.`id` = `posts_tags`.`tag_id`
+			WHERE `tags`.`tag` = ?);'
+	);
+	$stmt->execute($tags);
+
+	return $stmt->fetchAll();
+}
+
 
 function findAuthorNameByID(PDO $pdo, array $id): array | false
 {
@@ -88,12 +90,14 @@ function findAuthorNameByID(PDO $pdo, array $id): array | false
 
 function findAllAuthors(PDO $pdo): array | false
 {
-	return $pdo->query(
+	$allAuthors = $pdo->query(
 		'SELECT `id`, `name` FROM `authors`;'
 	)->fetchAll();
+
+	return !empty($allAuthors) ? $allAuthors : false;
 }
 
-function submitPost(PDO $pdo, array $data): bool
+function insertPost(PDO $pdo, array $data): bool
 {
 	return $pdo->prepare(
 		'INSERT INTO `posts` (`title`, `img_url`, `author_id`, `content`) 
@@ -142,32 +146,18 @@ function findTagIDsByName(PDO $pdo, array $tags): array | false
 
 function submitRating(PDO $pdo, array $rating): bool
 {
-	[$up_down, $id] = $rating;
+	[$plusOrMinusOne, $id] = $rating;
 	$stmt = $pdo->prepare(
 		'UPDATE `posts` SET `likes` = `likes` + :rating
 		WHERE id = :id'
 	);
-	$stmt->bindValue(':rating', ($up_down) ? 1 : -1, PDO::PARAM_INT);
+	$stmt->bindValue(':rating', $plusOrMinusOne, PDO::PARAM_INT);
 	$stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
 	return $stmt->execute();
 }
 
-/**
- * Execute a previously defined database function, catch any exception.
- * Returns query result on success or false if query was unsuccesful or
- * if an error occured.
- *
- * @param callable $queryfunc Database function to execute
- * @param aray $data optional array of data to pass on to database function
- * @return array | false
- */
-function query(callable $queryfunc, array $data = []): mixed
+function performQuery(callable $queryFunc, array $data = []): mixed
 {
-	try {
-		return $queryfunc(DBService::connectDB(), $data);
-	} catch (\Throwable $e) {
-		return  $e;
-		/* return  false; */
-	}
+	return $queryFunc(DBService::connectDB(), $data);
 }
