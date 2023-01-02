@@ -6,10 +6,9 @@ class DBService
 {
 	private static PDO $pdo;
 
-	public static function connectDB()
+	public static function connectDB(): PDO
 	{
-		return self::$pdo
-			?? (new self())::$pdo;
+		return self::$pdo ?? (new self())::$pdo;
 	}
 
 	private function __construct()
