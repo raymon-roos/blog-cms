@@ -9,6 +9,18 @@ third normal form.
 The point of the exercise was to practice working with a properly atomised database
 structure, using joins and sub-queries to retrieve desired information. 
 
+### Features
+
+**NOTE** There is no user/login management, so anyone can submit blog posts and there is
+no limit on how many times you can like or dislike a post, because I didn't want to
+implement a cookie system. 
+
+- Posts can be submitted through a web form.
+- Form submissions are validated. The site is immune to SQL injection and XSS.
+- Blog posts have metadata, such as a date, author name and related tags.
+- Posts can be browsed by author name or tag.
+- Posts can receive likes or dislikes.
+
 ### What I turned it into
 
 Having a fully functional database, I started working on organising the code,
